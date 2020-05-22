@@ -4,9 +4,26 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import { createStore , applyMiddleware, compose, combineReducers } from "redux";
+import burgerBuilderReducer from './store/reducers/burgerBuilder';
+import orderReducer from './store/reducers/order'
+import { Provider } from 'react-redux'
+import thunk from 'redux-thunk'
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const rootReducer = combineReducers({
+  burgerBuilder:burgerBuilderReducer,
+  order:orderReducer
+});
+
+const store = new createStore(rootReducer,composeEnhancers(
+  applyMiddleware(thunk)
+));
+
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}> <App /> </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
