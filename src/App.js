@@ -1,37 +1,62 @@
 import React, { Component } from 'react';
 import Layout from './hoc/Layout/Layout'
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder'
-import Checkout from './containers/Checkout/Checkout';
-import {BrowserRouter,Route,Switch} from 'react-router-dom'
-import Orders from './containers/Checkout/Orders/Orders'
+import {BrowserRouter,Route,Switch , Redirect} from 'react-router-dom'
+import Logout from './containers/Auth/Logout/Logout'
+
+import { connect} from 'react-redux'
+import * as actions from './store/actions/index'
+
+import asyncComponent from './hoc/asyncComponent/asyncComponent'
+
+const asyncCheckout = asyncComponent(()=>{
+  return import('./containers/Checkout/Checkout')
+})
+const asyncAuth = asyncComponent(()=>{
+  return import('./containers/Auth/Auth')
+})
+const asyncOrders = asyncComponent(()=>{
+  return import('./containers/Checkout/Orders/Orders')
+})
 
 class App extends Component {
-   /*state = {
-    show:true
-  }
+
 
  componentDidMount() {
-    setTimeout(()=> {
-       this.setState({show:false});
-       console.log(typeof(this.state.show),this.state.show);
-   },5000);
-  }*/
+    this.props.onTryAutoSignup()
+  }
 
   render(){
+    let routes =(
+      <Switch>
+              <Route  path = '/auth' component={ asyncAuth } />
+              <Route exact path = '/' component={ BurgerBuilder } />
+              <Redirect to="/" />
+            </Switch>
+
+    )
+
+    if (this.props.isAtuthenticated){
+      routes = (
+        <Switch>
+              <Route exact path = '/' component={ BurgerBuilder } />
+              <Route  path = '/checkout' component={ asyncCheckout } />
+              <Route  path = '/orders' component={ asyncOrders } />
+              <Route  path = '/auth' component={ asyncAuth } />
+              <Route  path = '/logout' component={ Logout } />
+              <Redirect to="/" />
+
+              <Route render={ ()=><h1> Not found</h1>} />
+            </Switch>
+
+      )
+    }
 
     return (
       <div >
         <BrowserRouter>
           <Layout>
-            <Switch>
-              <Route exact path = '/' component={ BurgerBuilder } />
-              <Route  path = '/checkout' component={ Checkout } />
-              <Route  path = '/orders' component={ Orders } />
-
-              <Route render={ ()=><h1> Not found</h1>} />
-            </Switch>
-            {/*this.state.show  ? <BurgerBuilder /> : null             <BurgerBuilder />
-            <Checkout />*/}
+              {routes}
           </Layout>
         </BrowserRouter>  
       </div>
@@ -39,4 +64,16 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = state =>{
+  return{
+    isAtuthenticated:state.auth.token!==null
+  }
+}
+
+const mapDispathToProps = dispatch =>{
+  return{
+    onTryAutoSignup:()=> dispatch(actions.authCheckState())
+  }
+}
+
+export default connect(mapStateToProps,mapDispathToProps)(App);

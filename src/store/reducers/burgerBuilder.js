@@ -1,6 +1,5 @@
-import React from 'react';
 import * as actionsType from '../actions/actionTypes';
-import {updateObject} from '../utility'
+import {updateObject} from '../../shared/utility'
 
 
 const INGREDIENTS_PRICES = {
@@ -13,7 +12,8 @@ const INGREDIENTS_PRICES = {
 const inicialState = {
         ingredients:null,
         totalPrice:4,
-        error:false
+        error:false,
+        building:false
 }
 
 
@@ -23,7 +23,9 @@ const addIngredient = (state, action)=>{
             const uptdateIngredients = updateObject(state.ingredients,updateIngrediente)
             const updateState = {
                 ingredients:uptdateIngredients,
-                totalPrice:state.totalPrice+INGREDIENTS_PRICES[action.ingredientName]
+                totalPrice:state.totalPrice+INGREDIENTS_PRICES[action.ingredientName],
+                building:true
+
 
             }
             return  updateObject(state,updateState) 
@@ -34,7 +36,9 @@ const removeIngredient = (state, action)=>{
     const uptdateIngs = updateObject(state.ingredients,updateIng)
     const updateS = {
         ingredients:uptdateIngs,
-        totalPrice:state.totalPrice-INGREDIENTS_PRICES[action.ingredientName]
+        totalPrice:state.totalPrice-INGREDIENTS_PRICES[action.ingredientName],
+        building:true
+
 
     }
     return  updateObject(state,updateS) 
@@ -43,7 +47,8 @@ const setIngredients = (state, action)=>{
     const updState = {
         ingredients:action.ingredients,
         error:false,
-        totalPrice: inicialState.totalPrice
+        totalPrice: inicialState.totalPrice,
+        building:false
     }
     return updateObject(state,updState)
 }

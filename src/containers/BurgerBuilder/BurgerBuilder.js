@@ -9,8 +9,6 @@ import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 import { connect } from 'react-redux';
-import { dispatch } from 'redux';
-//import * as actionsType from '../../store/actions/actionTypes';
 import * as actionsCreators from '../../store/actions/index';
 
 
@@ -43,7 +41,6 @@ class BurgerBuilder extends Component{
 
 
 componentDidMount(){
-    console.log(this.props);
     this.props.onSetIngredients();
 }
 
@@ -52,7 +49,15 @@ updatePurchasable = (ingredients)=>{
     return sum>0;
 } 
 
- purchasingHandler = ()=>(this.setState({purchasing:true}))
+ purchasingHandler = ()=>{
+     if (this.props.isAuthenticated){
+        this.setState({purchasing:true})
+     }else {
+         this.props.onSetRedirectPah('/checkout')
+         this.props.history.push('/auth')
+     }
+     
+ }
  modalHandler = ()=>(this.setState({purchasing:false}))
 
  continueHandler = ()=>{
@@ -68,7 +73,7 @@ updatePurchasable = (ingredients)=>{
 
     render(){
         const disableInfo = {
-            ... this.props.ings
+            ...this.props.ings
         }
 
         for(let key in disableInfo){
@@ -87,6 +92,7 @@ updatePurchasable = (ingredients)=>{
                         disabled = {disableInfo } 
                         ingredientAdded = {this.props.onIngredientAdded } 
                         ingredientRemove = {this.props.onIngredientDeleted }
+                        isAuth={this.props.isAuthenticated}
                         ordered={this.purchasingHandler} /> </div>
 
                 </Aux>
@@ -117,7 +123,7 @@ const mapStateToProps = state =>{
          ings: state.burgerBuilder.ingredients,
          tp:state.burgerBuilder.totalPrice,
          error:state.burgerBuilder.error,
-         
+         isAuthenticated:state.auth.token!==null        
 
     };
 };
@@ -127,7 +133,8 @@ const mapDispatchToProps = dispatch =>{
         onIngredientAdded: (value)=>dispatch(actionsCreators.addIngredient(value)),
         onIngredientDeleted:(value)=>dispatch(actionsCreators.deleteIngredient(value)),
         onSetIngredients:()=>dispatch(actionsCreators.initIngredients()),
-        onPurchaseInit:()=>dispatch(actionsCreators.purchaseInit())
+        onPurchaseInit:()=>dispatch(actionsCreators.purchaseInit()),
+        onSetRedirectPah: (path)=>dispatch(actionsCreators.setAuthRedirect(path))
     };
 };
 

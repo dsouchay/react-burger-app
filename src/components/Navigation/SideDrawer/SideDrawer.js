@@ -12,14 +12,13 @@ const SideDrawer = (props) =>{
   if (props.open){
       attachedClasses = [classes.SideDrawer, classes.Open];
   }
-
     return (
         <Aux>
             <Backdrop show={props.open} clicked={props.closed} />
-            <div className={attachedClasses.join(' ')}>
+            <div className={attachedClasses.join(' ')} onClick={props.closed} >
                 <div className={classes.Logo}> <Logo /></div>
                 
-                <nav><NavigationItems /></nav>
+                <nav><NavigationItems isAuth={ props.isAuth}/></nav>
                 
             </div>
 

@@ -8,6 +8,8 @@ import Input from '../../../components/UI/Input/Input'
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
 import * as actions from '../../../store/actions/index'
 
+import {updateObject,checkValidity} from '../../../shared/utility'
+
 import { connect } from 'react-redux';
 
 
@@ -97,20 +99,6 @@ class ContactData extends Component{
     }
 
 
-    checkValidity = (value,rules)=>{
-        let isValid = true;
-        if (!rules) return true
-        if ( rules.required) {
-            isValid = value.trim()!=='' && isValid;
-        }
-        if ( rules.minLength) {
-            isValid = value.length>=rules.minLength && isValid;
-        }  
-        if ( rules.maxLength) {
-            isValid = value.length<=rules.maxLength && isValid;
-        }
-        return isValid;
-    }
 
     orderHandler=(event)=>{
         event.preventDefault();
@@ -120,14 +108,15 @@ class ContactData extends Component{
         const order = {
             ingredients:this.props.ingredients,
             price: this.props.price,
-            orderData:formData
+            orderData:formData,
+            userId:this.props.userId
 
         }
         for(let idElement in this.state.orderForm){
             formData[idElement] = this.state.orderForm[idElement].value;
         }
         order.orderData = formData;
-        this.props.onOrderBurger(order);
+        this.props.onOrderBurger(order,this.props.token);
 
             /*axios.post('/order.json',order)
             .then(
@@ -141,13 +130,15 @@ class ContactData extends Component{
     }
     changedHandler = (event,InputIdentifier)=>{
 
-        const updateOrderForm = { ...this.state.orderForm } //Copio objeto del estado
-        const updatedFormElement = {...updateOrderForm[InputIdentifier]} // El ogjeto tiene propiedades que son objetos y las copio para acceder al valor que quiero modificar
-        updatedFormElement.value = event.target.value; //actualizo el valor dentro del subobjeto copiado
-        updatedFormElement.valid = this.checkValidity(updatedFormElement.value,updatedFormElement.validation)
+        const updatedFormElement = updateObject(this.state.orderForm[InputIdentifier],{
+            value:event.target.value,
+            valid:checkValidity(event.target.value,this.state.orderForm[InputIdentifier].validation),
+            touch:true
+        }) 
+        const updateOrderForm = updateObject(this.state.orderForm,{
+            [InputIdentifier]:updatedFormElement
+        }) 
 
-        updatedFormElement.touch = true;
-        updateOrderForm[InputIdentifier]=updatedFormElement;
         let formIsValid = true;
         for (let inputId in updateOrderForm){
             formIsValid = updateOrderForm[inputId].valid && formIsValid;
@@ -201,7 +192,10 @@ const mapStateToProps = state =>{
     return {
         ingredients: state.burgerBuilder.ingredients,
          price:state.burgerBuilder.totalPrice,
-         loading:state.order.loading
+         loading:state.order.loading,
+         token:state.auth.token,
+         userId: state.auth.userId
+
 
 
     };
@@ -209,7 +203,7 @@ const mapStateToProps = state =>{
 
 const dispatchToProps = dispatch =>{
     return {
-        onOrderBurger: (orderData) =>dispatch(actions.puchaseBurger(orderData))
+        onOrderBurger: (orderData,token) =>dispatch(actions.puchaseBurger(orderData,token))
 
     }
 };

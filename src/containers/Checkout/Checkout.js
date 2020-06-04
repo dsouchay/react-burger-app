@@ -1,13 +1,10 @@
 import React,{Component} from 'react';
-import classes from './Checkout.module.css'
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary'
 import ContactData from '../Checkout/ContactData/ContactData'
 import {Route,Redirect} from 'react-router-dom'
 
-import * as actions from '../../store/actions/index'
 
 import { connect } from 'react-redux';
-import orderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
 class Checkout extends Component {
    /* state = {

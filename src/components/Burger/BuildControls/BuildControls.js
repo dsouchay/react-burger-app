@@ -19,7 +19,8 @@ const BuildControls = (props) => (
         added = {() => {props.ingredientAdded(el.type)} } 
         removed = {() => {props.ingredientRemove(el.type)} }
         disabled = { props.disabled[el.type] } />)}
-        <button className={classes.OrderButton} disabled={props.purchasabled} onClick={props.ordered}> ORDER NOW </button>
+        <button className={classes.OrderButton} disabled={props.purchasabled } onClick={props.ordered}>
+            { props.isAuth?'ORDER NOW':'SIGN UP TO ORDER'}  </button>
        
     </div>
   
